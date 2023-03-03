@@ -40,6 +40,15 @@ exports.validateCreateProduct = (data) => {
 	return schema.validate(data);
 };
 
+exports.validateFilterProduct = (data) => {
+	const schema = Joi.object({
+		name: Joi.string().min(3).max(128),
+		price: Joi.number().integer().min(100)
+	
+	});
+	return schema.validate(data);
+};
+
 exports.validateEditProduct = (data) => {
 	const schema = Joi.object({
 		id: Joi.custom(isObjectId).required(),
