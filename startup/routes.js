@@ -18,6 +18,6 @@ module.exports = function(app) {
 	app.use('/products', product);
 	app.use('/cart', cart);
 	app.use('/profile', profile);
-	
+	// error
 	app.use(error);
 };

@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
-const isObjectId = require('./validation/isObjectId');
+const isObjectId = require('./validations/isObjectId');
+
 
 const cartSchema = new mongoose.Schema({
 	
@@ -31,8 +32,12 @@ exports.Cart = mongoose.model('Cart', cartSchema);
 
 exports.validateCart = (data) => {
 	const schema = Joi.object({
-		id: Joi.custom(isObjectId).required()
-
+		item: Joi.array()
+			.items({
+				product: Joi.custom(isObjectId).required(),
+				quantity: Joi.number().required(),
+			
+			})
 	});
 	return schema.validate(data);
 };

@@ -17,5 +17,7 @@ module.exports = function() {
 			)
 			})
 		);
-	} catch(error) {}
+	} catch(error) {
+		winston.error(error);
+	}
 };
