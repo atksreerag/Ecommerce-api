@@ -14,6 +14,9 @@ router.get('/', auth, (req, res, next) => {
 	repository.getCart(req, res, next);
 });
 
+router.delete('/:id', auth, (req, res, next) => {
+	repository.deleteCartProduct(req, res, next);
+});
 
 
 module.exports = router;

@@ -10,6 +10,14 @@ const cartSchema = new mongoose.Schema({
 		required: true,
 		ref: 'User'
 	},
+	// active: {
+	// 	type: Boolean,
+	// 	default: true
+	//   },
+	//   modifiedOn: {
+	// 	type: Date,
+	// 	default: Date.now
+	//   }
     
 	item:[{
 		product: {
@@ -20,7 +28,9 @@ const cartSchema = new mongoose.Schema({
 		quantity: {
 			type: Number,
 			min: 1
-		}
+		},
+		// name: String,
+		// price: Number
         
 	}]
 },
@@ -38,6 +48,13 @@ exports.validateCart = (data) => {
 				quantity: Joi.number().required(),
 			
 			})
+	});
+	return schema.validate(data);
+};
+
+exports.validateCartProduct = (data) => {
+	const schema = Joi.object({
+		id: Joi.custom(isObjectId).required()
 	});
 	return schema.validate(data);
 };

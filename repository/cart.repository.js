@@ -1,10 +1,14 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const Response = require('../middlewares/response');
-const { Cart, validateCart, validateGetCart } = require('../models/cart');
-const { User } = require('../models/user');
-const { Products } = require('../models/products');
+const { Cart, validateCart, validateCartProduct } = require('../models/cart');
 const { default: mongoose } = require('mongoose');
 
+
+/**
+ * Add to Cart
+ * @param {Array} item
+ * @returns
+ */
 exports.addToCart = asyncMiddleware(async (req, res, next) => {
 	
 	const { error } = validateCart(req.body);
@@ -15,16 +19,32 @@ exports.addToCart = asyncMiddleware(async (req, res, next) => {
 	var data = req.body;
 	data.user = req.user._id;
 
-	let schema = new Cart(data);
-	await schema.save();
+	let product = await Cart.findOne({ 'item.product': data.item[0].product });
+	if (product) {
+		console.log('in');
+		let response = Response('success', 'This Product Is Already Added');
+		return res.status(response.statusCode).send(response);
+	}
+	
+	let cart = 	await Cart.updateOne({ user: data.user }, {
+		$push: { item: data.item } 
+	});
 
+	if (!cart) {
+		let schema = new Cart(data);
+		await schema.save();
+	}
+	
 	let response = Response('success');
 	return res.status(response.statusCode).send(response);
 });
 
 
+/**
+ * Get Cart
+ * @returns {Array}
+ */
 exports.getCart = asyncMiddleware(async (req, res, next) => {
-	console.log('user', req.user._id);
 
 	let cart = await Cart.aggregate([
 			
@@ -62,12 +82,41 @@ exports.getCart = asyncMiddleware(async (req, res, next) => {
 				_id: '$products.product._id',
 				name: '$products.product.name',	
 				quantity: '$item.quantity',					
-				price: { $sum: { $multiply: ['$item.quantity', '$products.product.price'] } },
+				
 				
 			}
 		},
 	]);
 
 	let response = Response('success', '', cart);
+	return res.status(response.statusCode).send(response);
+});
+
+
+
+/**
+ * Delete Cart Product
+ * @param {ObjectId} id
+ * @returns
+ */
+exports.deleteCartProduct = asyncMiddleware(async (req, res, next) => {
+	req.body.id = req.params.id;
+
+	const { error } = validateCartProduct(req.body);
+	if (error) {
+		let response = Response('error', error.details[0].message);
+		return res.status(response.statusCode).send(response);
+	}
+
+	let product = await Cart.findOneAndUpdate( { user: mongoose.Types.ObjectId(req.user._id),
+		'item.product': { $in: mongoose.Types.ObjectId(req.body.id)}  },
+	{ $pull: { item: { product: mongoose.Types.ObjectId(req.body.id) } } }, { new: true });
+	
+	if (!product) {
+		let response = Response('success', 'Invalid Product');
+		return res.status(response.statusCode).send(response);
+	}
+
+	let response = Response('success');
 	return res.status(response.statusCode).send(response);
 });
