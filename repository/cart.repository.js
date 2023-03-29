@@ -1,7 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const Response = require('../middlewares/response');
 const { Cart, validateCart, validateCartProduct } = require('../models/cart');
-const { default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 
 
 /**
@@ -21,7 +21,6 @@ exports.addToCart = asyncMiddleware(async (req, res, next) => {
 
 	let product = await Cart.findOne({ 'item.product': data.item[0].product });
 	if (product) {
-		console.log('in');
 		let response = Response('success', 'This Product Is Already Added');
 		return res.status(response.statusCode).send(response);
 	}
@@ -72,17 +71,15 @@ exports.getCart = asyncMiddleware(async (req, res, next) => {
 			
 		},
 		{
-			$addFields: {
-				price: { $sum: { $multiply: ['$item.quantity', '$products.product.price'] } }
-			}
+			$addFields: { total : { $multiply: [ '$item.quantity', '$products.product.price' ] }}
 		},
 		
 		{
 			$project:{
 				_id: '$products.product._id',
 				name: '$products.product.name',	
-				quantity: '$item.quantity',					
-				
+				quantity: '$item.quantity',	
+				price: '$total' 						
 				
 			}
 		},
@@ -108,15 +105,18 @@ exports.deleteCartProduct = asyncMiddleware(async (req, res, next) => {
 		return res.status(response.statusCode).send(response);
 	}
 
-	let product = await Cart.findOneAndUpdate( { user: mongoose.Types.ObjectId(req.user._id),
+	let product = await Cart.findOneAndUpdate({ user: mongoose.Types.ObjectId(req.user._id),
 		'item.product': { $in: mongoose.Types.ObjectId(req.body.id)}  },
-	{ $pull: { item: { product: mongoose.Types.ObjectId(req.body.id) } } }, { new: true });
+	{ 
+		$pull: { item: { product: mongoose.Types.ObjectId(req.body.id) } } 
+	}, 
+	{ new: true });
 	
 	if (!product) {
 		let response = Response('success', 'Invalid Product');
 		return res.status(response.statusCode).send(response);
 	}
 
-	let response = Response('success');
+	let response = Response('success', 'Product deleted from cart');
 	return res.status(response.statusCode).send(response);
 });

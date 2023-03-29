@@ -32,11 +32,11 @@ userSchema.methods.generateAuthToken = async function() {
 		return jwt.sign(
 			{
 				_id: this._id,
-				//name: this.name,
+				name: this.name,
 				phone: this.phone,
 				
 			}, // payload
-			'SECRETS.JWT_SECRET_KEY', // secret key
+			SECRETS.JWT_SECRET_KEY, // secret key
 			{ expiresIn: '1 days' }
 		);
 
@@ -58,7 +58,7 @@ userSchema.methods.generateRefreshToken = function() {
 					//admin: this.isAdmin,
 					
 				}, // payload
-				'SECRETS.JWT_REFRESH_SECRET_KEY', // secret key
+				SECRETS.JWT_REFRESH_SECRET_KEY, // secret key
 				{ expiresIn: '30 days' }
 			);
 		}
