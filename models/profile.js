@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
-const isObjectId = require('./validations/isObjectId');
+
 
 const profileSchema = new mongoose.Schema(
 	{
@@ -22,6 +22,15 @@ const profileSchema = new mongoose.Schema(
 			type: Number,
 			min: 4,
 			required: true
+		},
+		user: {
+			type: mongoose.Schema.Types.ObjectId,
+			required: true,
+			ref: 'User'
+		},
+		modifiedOn: {
+			type: Date,
+			default: Date.now()
 		}
 	},
 	{
@@ -45,7 +54,6 @@ exports.validateProfile = (data) => {
 
 exports.validateUpdateProfile = (data) => {
 	const schema = Joi.object({
-		id: Joi.custom(isObjectId).required(),
 		firstName: Joi.string().min(4).required(),
 		lastName: Joi.string().min(1),
 		address: Joi.string().min(4).required(),
