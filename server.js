@@ -10,7 +10,6 @@ require('./startup/routes')(app);
 
 
 app.get('/', (req, res) => {
-	console.log('ops');
 	return res.send(
 		`SERVER ${API_VERSION} RUNNING...${process.env.TEST_ENV_VARIABLE}`
 	);
