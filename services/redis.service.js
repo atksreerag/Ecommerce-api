@@ -13,11 +13,11 @@ module.exports = async () => {
 
 		client.on('connect', () => {
 			console.log('connected to Redis');
-			// winston.info(`connected to Redis ${ config.REDIS_HOST }`);
+			winston.info('connected to Redis');
 		});
         
 		client.on('error', (err) => {
-			console.log(`Redis has occurred - ${config.REDIS_HOST}, ${ err }`);
+			console.log(`Redis has occurred - ${ err }`);
 			winston.error(`Redis has occurred ${ err }`);
 		});
 

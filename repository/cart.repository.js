@@ -1,7 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const Response = require('../middlewares/response');
 const { Cart, validateCart, validateCartProduct } = require('../models/cart');
-const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
 
 
 /**
@@ -49,7 +49,7 @@ exports.getCart = asyncMiddleware(async (req, res, next) => {
 			
 		{
 			$match: {
-				user: mongoose.Types.ObjectId(req.user._id) 
+				user: ObjectId(req.user._id) 
 			}
 		},
 	
@@ -105,10 +105,10 @@ exports.deleteCartProduct = asyncMiddleware(async (req, res, next) => {
 		return res.status(response.statusCode).send(response);
 	}
 
-	let product = await Cart.findOneAndUpdate({ user: mongoose.Types.ObjectId(req.user._id),
-		'item.product': { $in: mongoose.Types.ObjectId(req.body.id)}  },
+	let product = await Cart.findOneAndUpdate({ user: ObjectId(req.user._id),
+		'item.product': { $in: ObjectId(req.body.id)}  },
 	{ 
-		$pull: { item: { product: mongoose.Types.ObjectId(req.body.id) } } 
+		$pull: { item: { product: ObjectId(req.body.id) } } 
 	}, 
 	{ new: true });
 	
@@ -120,3 +120,4 @@ exports.deleteCartProduct = asyncMiddleware(async (req, res, next) => {
 	let response = Response('success', 'Product deleted from cart');
 	return res.status(response.statusCode).send(response);
 });
+

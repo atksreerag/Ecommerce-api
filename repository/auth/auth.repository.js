@@ -128,7 +128,6 @@ exports.signUp = asyncMiddleware(async (req, res, next) => {
 		{ phone: phone },
 		' _id name phone'
 	).populate('name').exec();
-	console.log('user', user);
 
 	if (!user) {
 		user = new User({
@@ -233,7 +232,6 @@ exports.userVerification = asyncMiddleware(async (req, res, next) => {
 		{ phone: phone },
 		' _id name phone'
 	).populate('name').exec();
-	console.log('user', user);
 
 	// if (!user) {
 	// 	user = new User({

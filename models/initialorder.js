@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const joi = require('joi');
+const Joi = require('joi');
+const isObjectId = require('./validations/isObjectId');
 
 const initialOrderSchema = new mongoose.Schema(
 	{
@@ -25,9 +26,9 @@ const initialOrderSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Order'
 		},
-		// paymentInitiatedAt: {
-		// 	type: Date
-		// },
+		paymentInitiatedAt: {
+			type: Date
+		},
 		// isUserReceivedPaymentRequest: {
 		// 	type: Boolean,
 		// 	default: false
@@ -56,10 +57,10 @@ const initialOrderSchema = new mongoose.Schema(
 		paymentCompletedAt: {
 			type: Date
 		},
-		orders: [{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Order'
-		}],
+		expiry: {
+			type: Date,
+			required: true
+		},
 		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
@@ -72,3 +73,12 @@ const initialOrderSchema = new mongoose.Schema(
 );
 
 exports.InitialOrder = mongoose.model('InitialOrder', initialOrderSchema);
+
+exports.validateCreateInitialOrder = function validateCreateInitialOrder(order) {
+	const schema = Joi.object({
+		// user: Joi.custom(isObjectId).required(),
+		billAmount: Joi.number().greater(0).required(),
+		notes: Joi.string().min(3).max(128),
+	});
+	return schema.validate(order);
+};
