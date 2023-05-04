@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const API_VERSION = '3.0.1';
 
 
 require('dotenv').config();
@@ -11,7 +10,7 @@ require('./startup/routes')(app);
 
 app.get('/', (req, res) => {
 	return res.send(
-		`SERVER ${API_VERSION} RUNNING...${process.env.TEST_ENV_VARIABLE}`
+		`SERVER RUNNING...${process.env.TEST_ENV_VARIABLE}`
 	);
 });
 
