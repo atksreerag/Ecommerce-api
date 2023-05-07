@@ -10,11 +10,11 @@ router.post('/initial-order', auth, (req, res, next) => {
 	repository.initialOrder(req, res, next);
 });
 
-router.post('/order', auth, (req, res, next) => {
+router.post('/', auth, (req, res, next) => {
 	repository.createOrder(req, res, next);
 });
 
-router.get('/order', auth, (req, res, next) => {
+router.get('/', auth, (req, res, next) => {
 	repository.viewOrder(req, res, next);
 });
 

@@ -117,7 +117,10 @@ exports.createOrder = asyncMiddleware(async(req, res, next) => {
 			return res.status(response.statusCode).send(response);
 		}
 	} else {
-		let razorpayOrder = await Razorpay.createOrder(data.amount, data.currency, data.receipt, data.notes);
+		let currency = 'INR';
+		let receipt = Math.random().toString(36).substring(2,12);
+
+		let razorpayOrder = await Razorpay.createOrder(data.billAmount, currency, receipt);
 		if (!razorpayOrder) {
 			let response = Response('error', 'Error in Razorpay order creation');
 			return res.status(response.statusCode).send(response);
@@ -152,7 +155,7 @@ exports.createOrder = asyncMiddleware(async(req, res, next) => {
 		await InitialOrder.findOneAndUpdate({ user: req.user._id }, { order: order._id, isPaymentCompleted: true });
 	}
 
-	let response = Response('success', 'Order placed successfully', order);
+	let response = Response('success', '', order);
 	return res.status(response.statusCode).send(response);
 
 });

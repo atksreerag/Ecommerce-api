@@ -18,7 +18,7 @@ exports.createOrder = async (amount, currency, receipt, notes = '') => {
 
 		var options = {
 			amount: Number((amount * 100).toFixed(0)),
-			currency: 'INR',
+			currency: currency,
 			receipt: receipt,
 
 			// Transfers Disabled for now
