@@ -22,7 +22,7 @@ module.exports = function(app) {
 	app.use('/products', product);
 	app.use('/cart', cart);
 	app.use('/profile', profile);
-	app.use('/payment', order);
+	app.use('/order', order);
 	app.use('/wishlist', wishlist);
 	app.use(error);
 };
