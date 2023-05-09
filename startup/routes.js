@@ -17,7 +17,7 @@ module.exports = function(app) {
 	app.use(express.urlencoded({ limit: '2mb', extended: true }));
 	app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS if you use an ELB, custom Nginx setup, etc)
 
-	//app.use('/uploads', express.static('uploads'));
+	app.use('/uploads', express.static('uploads'));
 	app.use('/auth', auth);
 	app.use('/products', product);
 	app.use('/cart', cart);
