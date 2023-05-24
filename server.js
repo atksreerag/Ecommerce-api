@@ -1,6 +1,11 @@
 const express = require('express');
 const app = express();
 
+// app.get('/', async (req, res, next) => {
+// 	console.log('hai');
+// 	res.sendFile('./public/index.html', { root: __dirname });
+// });
+
 
 require('dotenv').config();
 require('./startup/logging')();
@@ -13,6 +18,7 @@ app.get('/', (req, res) => {
 		`SERVER RUNNING...${process.env.TEST_ENV_VARIABLE}`
 	);
 });
+
 
 const port = process.env.PORT || 3000;
 
