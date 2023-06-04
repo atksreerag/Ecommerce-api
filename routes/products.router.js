@@ -5,11 +5,18 @@ const router = express.Router();
 //const auth = require('../middlewares/auth');
 const repository = require('../repository/products/products.repository');
 //const couponRepository = require('../repository/products/coupon.repository');
+const multer = require('multer');
+const storage = require('../middlewares/imageUpload');
 
 
-router.post('/', auth, (req, res, next) => {
-	repository.createProduct(req, res, next);
-});
+const upload = multer({ storage : storage }).single('image'); 
+
+
+router.post('/', auth, ((req, res, next) => {
+	upload(req, res, ()=>{
+		repository.createProduct(req, res, next);
+	});
+}));
 
 router.get('/', auth, (req, res, next) => {
 	repository.listProducts(req, res, next);

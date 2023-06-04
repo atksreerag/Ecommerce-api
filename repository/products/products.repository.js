@@ -11,6 +11,7 @@ const pagination = require('../../utilities/pagination');
  * @param {String} description
  * @param {Number} price
  * @param {String} category
+ * @param {String} image
  * @returns
  */
 exports.createProduct = asyncMiddleware(async (req, res, next) => {
@@ -20,12 +21,14 @@ exports.createProduct = asyncMiddleware(async (req, res, next) => {
 		let response = Response('error', error.details[0].message);
 		return res.status(response.statusCode).send(response);
 	}
+	
 	var data = req.body;
+	data.image = req.file.path;
 
 	try {
 		var schema = new Products(data);
 		await schema.save();
-
+		
 	} catch (error) {
 		let response = Response('error', 'Error in add product');
 		return res.status(response.statusCode).send(response);

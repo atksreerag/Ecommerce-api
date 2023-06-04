@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 
 /**
- * Event Like (Heart) Schema
+ * Like (Heart) Schema
  */
 module.exports = new mongoose.Schema(
 	{
