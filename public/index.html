@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Document</title>
+  <style>
+	.button {
+	  background-color: #4CAF50; /* Green */
+	  border: none;
+	  color: white;
+	  padding: 15px 32px;
+	  text-align: center;
+	  text-decoration: none;
+	  display: inline-block;
+	  font-size: 16px;
+	  margin: 4px 2px;
+	  cursor: pointer;
+	}
+	
+	.button {
+		background-color: #008CBA;
+	}
+	</style>
+</head>
+<body>  
+	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+	<button class="button" id="rzp-button1">Pay</button>
+	<script>
+		var options = {
+		key: "rzp_test_k7IgiLwDl3IbiH", // Enter the Key ID generated from the Dashboard 
+		amount: 369, 
+       	currency: "INR",
+		name: "Sreerag", 
+		order_id: "order_LzxOgbUxgIg0xp", // For one time payment
+		prefill: {
+		name: "Sreerag",
+		email: "sreeragatk3@gmail.com",
+		contact: "9048282451"
+		},
+		theme: {
+		color: "#3399cc"
+		},
+		// This handler function will handle the success payment
+		handler: function (response) {
+		alert(response.razorpay_signature);
+		console.log(response);
+		alert(response.razorpay_payment_id);
+		alert("Payment Successfull")
+		},
+		};
+
+		var rzp1 = new Razorpay(options);
+		console.log('successfull', rzp1);
+		document.getElementById('rzp-button1').onclick = function (e) {
+		console.log('eyui', e);
+		rzp1.open();
+		e.preventDefault();
+		}
+
+		rzp1.on('payment.failed', function (response)
+		{     
+		console.log('res', response);       
+		alert(response.error.code);     
+		alert(response.error.description);      
+		alert(response.error.source);
+		alert(response.error.step);     
+		alert(response.error.reason);
+		alert(response.error.metadata.order_id);
+		alert(response.error.metadata.payment_id);
+		alert(response.error.metadata.signature);
+		})
+</script>
+	
+</body>
+</html>
+
+
+

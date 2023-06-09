@@ -39,14 +39,14 @@ exports.createOrder = async (amount, currency, receipt, notes = '') => {
 			// 	}
 			// ],
 
-			payment: {
-				capture : 'automatic',
-				capture_options : {
-					automatic_expiry_period : 7200, // Minutes - 5 days
-					// manual_expiry_period : 7200, // Optional (default: 7200)
-					refund_speed : 'normal'
-				}
-			}
+			// payment: {
+			// 	capture : 'automatic',
+			// 	capture_options : {
+			// 		automatic_expiry_period : 7200, // Minutes - 5 days
+			// 		// manual_expiry_period : 7200, // Optional (default: 7200)
+			// 		refund_speed : 'normal'
+			// 	}
+			// }
 		};
 
 		try {
