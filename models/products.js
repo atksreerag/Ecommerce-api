@@ -64,7 +64,7 @@ exports.validateFilterProduct = (data) => {
 	const schema = Joi.object({
 		name: Joi.string().min(3).max(128),
 		price: Joi.number().integer().min(100),
-		category: Joi.string().min(4).max(10).required(),
+		category: Joi.string().min(4).max(10),
 		page: Joi.number()
 	
 	});

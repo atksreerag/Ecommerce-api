@@ -111,6 +111,7 @@ exports.editProduct = asyncMiddleware(async (req, res, next) => {
 	}
 
 	let data = req.body;
+	data.image = req.file.path;
 
 	let updatedData = await Products.findOneAndUpdate({ _id: data.id },
 		data,
