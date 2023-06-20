@@ -8,7 +8,7 @@ const winston = require('winston');
  * @param {number} page_limit
  * @param {number} current_page
  */
-module.exports = (response, total_count, page_limit, current_page=1) => {
+module.exports = (response, total_count, page_limit, current_page = 1) => {
 	try {
 		const total_pages = total_count <= page_limit ? 1 : Math.ceil( total_count / page_limit );
 
