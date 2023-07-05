@@ -103,5 +103,18 @@ exports.validateGetOrder = (data) => {
 	return schema.validate(data);
 };
 
+exports.validateAllOrder = (data) => {
+	const schema = Joi.object({
+		page: Joi.number().integer(),
+		product: Joi.string().min(4),
+		startDate: Joi.date(),
+		endDate: Joi.date(),
+		price: Joi.number(),
+		deliveryDate: Joi.date(),
+		status: Joi.string().allow('success', 'failed'),
+		type: Joi.string().allow('COD', 'razorpay')
+	});
+	return schema.validate(data);
+};
 
 

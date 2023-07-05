@@ -2,10 +2,14 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const Response = require('../middlewares/response');
 const { InitialOrder, validateCreateInitialOrder } = require('../models/initialorder');
 const { User } = require('../models/user');
-const { Order, validateOrder, validateGetOrder } = require('../models/order');
+const { Order, validateOrder, validateGetOrder, validateAllOrder } = require('../models/order');
 const { Profile } = require('../models/profile');
+const { Payment } = require('../models/payments');
 const pagination = require('../utilities/pagination');
 const Razorpay = require('../services/razorpay.service');
+const { setStartDateTime, setEndDateTime } = require('../utilities/setDateTime');
+const crypto = require('crypto');
+const SECRETS = require('../config/secrets');
 
 
 /**
@@ -174,7 +178,7 @@ exports.viewOrder = asyncMiddleware(async (req, res, next) => {
 		return res.status(response.statusCode).send(response);
 	}
 
-	let PAGE_LIMIT = 1;
+	const PAGE_LIMIT = 1;
 	const pageNo = Number(req.query.page) > 1 ? Number(req.query.page) : 1;
 
 	let query = {};
@@ -191,4 +195,106 @@ exports.viewOrder = asyncMiddleware(async (req, res, next) => {
 	let response = Response('success', '', { order });
 	response = pagination(response, count, PAGE_LIMIT, pageNo);
 	return res.send(response);
+});
+
+/**
+ * View All Orders
+ * @param { String } product
+ * @param { Date } startDate
+ * @param { Date } endDate
+ * @param { Number } price
+ * @param { String } status
+ * @param { String } type
+ * @param { Date } deliveryDate
+ * @returns
+ */
+exports.viewAllOrders = asyncMiddleware(async (req, res, next) => {
+	const { error } = validateAllOrder(req.query);
+	if (error) {
+		let response = Response('error', error.details[0].messsage);
+		return res.status(response.statusCode).send(response);
+	}
+
+	const page_limit = 10;
+	const pageNo = req.query.page;
+
+	let query = {};
+	if (req.query.product) query.products = new RegExp(req.query.product, 'i');
+	if (req.query.startDate) query.createdAt = setStartDateTime(req.query.startDate);
+	if (req.query.endDate) query.createdAt = setEndDateTime(req.query.endDate);
+	if (req.query.price) query.billAmount = req.query.price;
+	if (req.query.status) query.status = req.query.status;
+	if (req.query.type) query.type = req.query.type;
+
+	const count = await Order.count();
+	const orders = await Order.find(query)
+		.sort({_id: -1})
+		.skip(page_limit * (pageNo - 1))
+		.limit(page_limit)
+		.lean();
+
+	let response = Response('success', '', orders);
+	response = pagination(response, count, page_limit, pageNo);
+	return res.status(response.statusCode).send(response);
+});
+
+
+/**
+ * Verify Order
+ * @param { String } orderId
+ * @param { String } paymentId
+ * @returns
+ */
+exports.verifyOrder = asyncMiddleware(async (req, res, next) => {
+
+	let data = req.body;  
+	console.log('rur');   
+	const razorpaySignature =  req.headers['x-razorpay-signature'];
+
+	const razorpayOrder = await Order.findOne({ orderId: data.orderId });
+	console.log('aw', razorpayOrder);
+	if (!razorpayOrder) {
+		let response = Response('error', 'Invalid Order');
+		return res.status(response.statusCode).send(response);
+	}
+  
+	// Pass yours key_secret here
+	let key_secret = SECRETS.RAZORPAY_KEY_SECRET;     
+
+	// STEP 8: Verification & Send Response to User
+	console.log('hmac'); 
+		
+	// Creating hmac object 
+	let hmac = crypto.createHmac('sha256', key_secret);
+	
+
+	// Passing the data to be hashed
+	hmac.update(data.orderId + '|' + data.paymentId);
+	
+	// Creating the hmac in the required format
+	const generatedSignature = hmac.digest('hex');
+	console.log('fgf');
+
+	if (razorpaySignature !== generatedSignature) {
+		let response = Response('error', 'Invalid signature');
+		return res.status(response.statusCode).send(response);
+	}
+
+	try {
+		let payment = new Payment({
+			order: razorpayOrder._id,
+			paymentId: data.paymentId,
+			razorpayPayload: [{ orderCreation: razorpayOrder.razorpayPayload }],
+			createdBy: req.user._id,
+		});
+		console.log('pay', payment);
+		payment = await payment.save();
+		
+	} catch (error) {
+		let response = Response('error','Error in payment creation');
+		return res.status(response.statusCode).send(response);
+	}
+
+	let response = Response('success');
+	return res.status(response.statusCode).send(response);
 });
