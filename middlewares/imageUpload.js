@@ -9,6 +9,7 @@ exports.storage = multer.diskStorage({
 	}  
 });  
 
-exports.upload = multer({ storage : this.storage }).single('image'); 
+exports.upload = multer({ storage : this.storage }).array('image');
+//.single('image'); 
 
 ///module.exports = storage;

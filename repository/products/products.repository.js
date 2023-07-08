@@ -11,7 +11,7 @@ const pagination = require('../../utilities/pagination');
  * @param {String} description
  * @param {Number} price
  * @param {String} category
- * @param {String} image
+ * @param {files} image
  * @returns
  */
 exports.createProduct = asyncMiddleware(async (req, res, next) => {
@@ -22,11 +22,28 @@ exports.createProduct = asyncMiddleware(async (req, res, next) => {
 		return res.status(response.statusCode).send(response);
 	}
 	
-	var data = req.body;
-	data.image = req.file.path;
+	let data = req.body;
+	let images = [];
+
+	for (let i = 0; i < req.files.length; i++) images.push(req.files[i].path);
+
+	let alreadyAdded = data.name;
+
+	alreadyAdded = new RegExp(alreadyAdded, 'i');
+	let addedProduct = await Products.findOne({ name: alreadyAdded });
+	if (addedProduct) {
+		let response = Response('error', 'This Product is Already Added');
+		return res.status(response.statusCode).send(response);
+	}
 
 	try {
-		var schema = new Products(data);
+		var schema = new Products({
+			name: data.name,
+			price: data.price,
+			description: data.description,
+			category: data.category,
+			image: images
+		});
 		await schema.save();
 		
 	} catch (error) {
@@ -94,11 +111,12 @@ exports.listOneProducts = asyncMiddleware(async (req, res, next) => {
 
 /**
  * Edit Product
- * @param {objectId} id
+ * @param {ObjectId} id
  * @param {String} name
  * @param {String} description
  * @param {Number} price
  * @param {String} category
+ * @param {files} image
  * @returns
  */
 exports.editProduct = asyncMiddleware(async (req, res, next) => {
