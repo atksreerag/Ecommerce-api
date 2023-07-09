@@ -25,8 +25,15 @@ const productSchema = new mongoose.Schema(
 			required: true
 		},
 		image: {
-			type: String,
-			required: true
+			type: Array,
+			validate: {
+				validator: function (v) {
+					return v.length > 0;
+				},
+				message: 'Please Upload Atleast One Image'
+				
+			},
+			required: true		
 		},
 		hearts: {
 			type: Number,
@@ -54,8 +61,7 @@ exports.validateCreateProduct = (data) => {
 		name: Joi.string().min(3).max(128).required(),
 		description: Joi.string().min(3).max(500).required(),
 		price: Joi.number().integer().min(100).required(),
-		category: Joi.string().min(4).max(10).required()
-	
+		category: Joi.string().min(4).max(10).required(),
 	});
 	return schema.validate(data);
 };
@@ -86,6 +92,13 @@ exports.validateEditProduct = (data) => {
 exports.validateIsLiked = (data) => {
 	const schema = Joi.object({
 		isLiked: Joi.boolean(),
+		id: Joi.custom(isObjectId).required()
+	});
+	return schema.validate(data);
+};
+
+exports.validateListOneProducts = (data) => {
+	const schema = Joi.object({
 		id: Joi.custom(isObjectId).required()
 	});
 	return schema.validate(data);
